@@ -46,11 +46,17 @@ public class EndingManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
+                // DATA: the whole level is finished and player quit the game
+                Tinylytics.AnalyticsManager.LogCustomMetric("Finished Game and Quit", System.DateTime.Now.ToString());
+                
                 Application.Quit();
             }
 
             if (Input.GetKeyDown(KeyCode.R))
             {
+                // DATA: the whole level is finished and player restart the game to play again
+                Tinylytics.AnalyticsManager.LogCustomMetric("Game Restarted", System.DateTime.Now.ToString());
+                
                 SceneManager.LoadScene("SampleScene");
             }
         }

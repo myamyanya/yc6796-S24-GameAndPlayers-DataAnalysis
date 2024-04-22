@@ -71,6 +71,33 @@ public class GameManager : MonoBehaviour
 
     // For ending
     public EndingManager endingManager;
+    
+    // For DATA
+    public List<string> checkpointsOrder = new List<string>();
+    public string checkpointsOrderMergedString;
+
+    public int respawnedNum = 0;
+    
+    // Making GM into singleton
+    public static GameManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            
+            // Don't destroy the holder
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        
+        // DATA: the very beginning of the game
+        Tinylytics.AnalyticsManager.LogCustomMetric("Game Begins", System.DateTime.Now.ToString());
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -125,6 +152,9 @@ public class GameManager : MonoBehaviour
 
         // For Ending
         endingManager = GameObject.Find("EndingManagerHolder").GetComponent<EndingManager>();
+        
+        // Reset the Checkpoints recording list
+        checkpointsOrder = new List<string>();
     }
 
     // Update is called once per frame
@@ -217,6 +247,24 @@ public class GameManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
+                // DATA: the completed orders so far
+                if (checkpointsOrder.Count != 0)
+                {
+                    checkpointsOrderMergedString = string.Join("-", checkpointsOrder);
+                    Tinylytics.AnalyticsManager.LogCustomMetric("Checkpoints Order", checkpointsOrderMergedString);
+                }
+                else
+                {
+                    checkpointsOrderMergedString = "NO ORDER COMPLETED";
+                    Tinylytics.AnalyticsManager.LogCustomMetric("Checkpoints Order", checkpointsOrderMergedString);
+                }
+                
+                // DATA: how many times the player respawned
+                Tinylytics.AnalyticsManager.LogCustomMetric("Times of Respawn", respawnedNum.ToString());
+                
+                // DATA: the game didn't reach the end state and player decided to quit
+                Tinylytics.AnalyticsManager.LogCustomMetric("Game Quit in the Middle", System.DateTime.Now.ToString());
+                
                 Debug.Log("Quit Game");
                 Application.Quit();
             }
@@ -234,8 +282,17 @@ public class GameManager : MonoBehaviour
         if (packageNum >= packageTotal)
         {
             Debug.Log("Win!");
-
-
+            
+            // DATA: send the data of winning the game
+            Tinylytics.AnalyticsManager.LogCustomMetric("Win the Level", System.DateTime.Now.ToString());
+            
+            // DATA: the completed orders
+            checkpointsOrderMergedString = string.Join("-", checkpointsOrder);
+            Tinylytics.AnalyticsManager.LogCustomMetric("Checkpoints Order", checkpointsOrderMergedString);
+            
+            // DATA: how many times the player respawned
+            Tinylytics.AnalyticsManager.LogCustomMetric("Times of Respawn", respawnedNum.ToString());
+            
             StartCoroutine(ToEndLevel());
         }
 
@@ -259,6 +316,9 @@ public class GameManager : MonoBehaviour
     {
         isOver = true;
         overPageUI.enabled = true;
+        
+        /*// DATA: player sunk 
+        Tinylytics.AnalyticsManager.LogCustomMetric("Player Sunk", System.DateTime.Now.ToString());*/
     }
 
     void PauseGame()
@@ -298,6 +358,11 @@ public class GameManager : MonoBehaviour
         // Work with Listeners
         playerRespawned?.Invoke();
         oceanColliderRespawned?.Invoke();
+        
+        // DATA: send the time and position of the respawn action
+        Tinylytics.AnalyticsManager.LogCustomMetric("Player Respawned", player.transform.position.ToString());
+
+        respawnedNum++;
     }
 
     public void RefreshSmoke(string tag)

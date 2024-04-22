@@ -126,7 +126,7 @@ public class LPPV_CarController : MonoBehaviour {
 		deliver.enabled = false;
 
 		// For ending
-		endingManager = GameObject.Find("EndingManagerHolder").GetComponent <EndingManager>();
+		endingManager = GameObject.Find("EndingManagerHolder").GetComponent<EndingManager>();
     }
 
 	private void Move(float motorInput, float steerInput, bool handBrake)
@@ -331,6 +331,36 @@ public class LPPV_CarController : MonoBehaviour {
 					audioSource.clip = signPackage;
 					audioSource.PlayOneShot(signPackage);
 					deliver.enabled = false;
+					
+					// DATA: this checkpoint has been reached
+					switch (other.transform.parent.gameObject.tag)
+					{
+						case "Snake":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Snack Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Snake");
+							break;
+						case "Deer":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Deer Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Deer");
+							break;
+						case "Bird":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Bird Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Bird");
+							break;
+						case "Fish":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Fish Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Fish");
+							break;
+						case "Lizzard":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Lizard Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Lizard");
+							break;
+						case "Rat":
+							Tinylytics.AnalyticsManager.LogCustomMetric("Rat Checkpoint Reached", System.DateTime.Now.ToString());
+							GameManager.instance.checkpointsOrder.Add("Rat");
+							break;
+					}
+
                 }
 
             }
